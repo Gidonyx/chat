@@ -21,7 +21,7 @@ client_sock.sendall(name.encode())
 while True:
 
     #Читаем логи
-    history = open('text.txt', 'r')
+    history = open('data/text.txt', 'r')
     chtenie = history.read()
     print(chtenie)
     history.close()
@@ -35,7 +35,7 @@ while True:
 
     #Запоминаем время и записываем в лог
     vremya_client = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    history = open('text.txt', 'a')
+    history = open('data/text.txt', 'a')
     history.write(vremya_client + ' ' + '|' + ' ' + name + ':' + ' ' + text + '\n')
     history.close()
 

@@ -10,7 +10,7 @@ chanelTwo = 0
 clients = []
 clients2 = []
 
-serverlog = open('serverlog.txt', 'r')
+serverlog = open('data/serverlog.txt', 'r')
 chtenie = serverlog.read()
 print(chtenie)
 serverlog.close()
@@ -24,7 +24,7 @@ while True:
 
         data = client_sock.recv(1024)
 
-        serverlog = open('serverlog.txt', 'a')
+        serverlog = open('data/serverlog.txt', 'a')
         serverlog.write(vremya + ' ' + '|' + ' ' + str(data) + '\n')
         serverlog.close()
 
