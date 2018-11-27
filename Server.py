@@ -29,17 +29,17 @@ def main_process(client_sock, client_addr):
         if data == bytes('/set_chanelTwo'.encode()):
             clients2.append(client_addr)
             print('Во второй канал вошел новый клиент', client_addr, '\n', 'Действующие клиенты', ' ', clients2)
-        print(vremya, "|", client_addr, "-", data)
+        print(vremya, "|", client_addr, "-", data.decode("utf-8"))
 
         if not data:
             break
 
         if client_addr in clients:
-            for i in range(len(clients)):
+            for client_addr in clients:
                 client_sock.sendall(data)
 
         if client_addr in clients2:
-            for i in range(len(clients2)):
+            for client_addr in clients2:
                 client_sock.sendall(data)
 
 def main():
