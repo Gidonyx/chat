@@ -1,55 +1,71 @@
 import socket,time
+from threading import Thread
 
 client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client_sock.connect(('127.0.0.1', 53210))
 
 server = ('127.0.0.1', 53210)
 
-chanel = 0
-
-#Выбираем канал
-while chanel != '/set_chanelOne' and chanel != '/set_chanelTwo':
-    print("Введите команду для выбора канала /set_chanelOne или /set_chanelTwo")
-    chanel = input()
-client_sock.sendall(chanel.encode())
-
-#Вводим имя
-print('Введите имя')
-name = input()
-client_sock.sendall(name.encode())
-
-while True:
-
-    #Читаем логи
-    history = open('data/text.txt', 'r')
-    chtenie = history.read()
-    print(chtenie)
-    history.close()
-
-    #Проверяем на безсимвольность
-    print("Введите что-нибудь")
-    text = input()
-    if len(text) == 0:
-        print("В тексте нет ни одного символа")
-        continue
-
-    #Запоминаем время и записываем в лог
-    vremya_client = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    history = open('data/text.txt', 'a')
-    history.write(vremya_client + ' ' + '|' + ' ' + name + ':' + ' ' + text + '\n')
-    history.close()
-
-    #Отправляем сообщение
-    client_sock.sendall(text.encode())
-    data = client_sock.recv(1024)
-    print('Received', repr(data))
-
-    #Как закрыть клиент
-    if text == 'Exit':
-        client_sock.close()
-        break
 
 
+def listen_Server():
+    while True:
+        data = client_sock.recv(1024)
+        print('Received', repr(data.decode("utf-8")))
 
+def main():
 
-#client_sock.sendall(b'%(clienttext)s'%{"clienttext": text})
+    THREAD = Thread(target=listen_Server)
+    THREAD.start()
+
+    #Создаем канал
+    chanel = ''
+    print ("Для создания канала введите /create_chanel НАЗВАНИЕ")
+    #while chanel != '/set_chanelOne' and chanel != '/set_chanelTwo':
+    #    print("Введите команду для выбора канала /set_chanelOne или /set_chanelTwo")
+    #    chanel = input()
+    #client_sock.sendall(chanel.encode())
+
+    #Вводим имя
+    #while chanel != '/set_Nickname':
+    #    print('Введите команду, чтобы установить ник')
+    #    name = input()
+    #client_sock.sendall(name.encode())
+
+    print("Введите ник /set_Nickname <nickname>")
+    nickname, check = "",""
+    while check != '/set_Nickname':
+        nickname = input()
+        check = nickname.split()[0]
+    client_sock.sendall(nickname.encode())
+
+    while True:
+        #Читаем логи
+        history = open('data/text.txt', 'r')
+        print(history.read())
+        history.close()
+
+        #Проверяем на безсимвольность
+        print("Введите что-нибудь")
+        text = input()
+        if len(text) == 0:
+            print("В тексте нет ни одного символа")
+            continue
+        if text.split()[0] == '/create_chanel':
+            print("Создан канал с названием ", text.split()[1])
+
+        #Запоминаем время и записываем в лог
+        vremya_client = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        history = open('data/text.txt', 'a')
+        history.write(vremya_client + ' ' + '|' + ' ' + nickname.split()[1] + ':' + ' ' + text + '\n')
+        history.close()
+
+        #Отправляем сообщение
+        client_sock.sendall(text.encode())
+
+        #Как закрыть клиент
+        if text == 'Exit':
+            client_sock.close()
+            break
+if __name__ == "__main__":
+    main()
