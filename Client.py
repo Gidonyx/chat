@@ -10,8 +10,12 @@ server = ('127.0.0.1', 53210)
 
 def listen_Server():
     while True:
-        data = client_sock.recv(1024)
-        print('Received', repr(data.decode("utf-8")))
+        try:
+            data = client_sock.recv(1024)
+            print('Received', repr(data.decode("utf-8")))
+        except Exception:
+            print('Socket close')
+            return
 
 def main():
 
@@ -19,18 +23,7 @@ def main():
     THREAD.start()
 
     #Создаем канал
-    chanel = ''
     print ("Для создания канала введите /create_chanel НАЗВАНИЕ")
-    #while chanel != '/set_chanelOne' and chanel != '/set_chanelTwo':
-    #    print("Введите команду для выбора канала /set_chanelOne или /set_chanelTwo")
-    #    chanel = input()
-    #client_sock.sendall(chanel.encode())
-
-    #Вводим имя
-    #while chanel != '/set_Nickname':
-    #    print('Введите команду, чтобы установить ник')
-    #    name = input()
-    #client_sock.sendall(name.encode())
 
     print("Введите ник /set_Nickname <nickname>")
     nickname, check = "",""
@@ -41,9 +34,9 @@ def main():
 
     while True:
         #Читаем логи
-        history = open('data/text.txt', 'r')
-        print(history.read())
-        history.close()
+     #   history = open('data/text.txt', 'r')
+     #   print(history.read())
+     #   history.close()
 
         #Проверяем на безсимвольность
         print("Введите что-нибудь")
