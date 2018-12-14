@@ -2,9 +2,9 @@ import socket,time
 from threading import Thread
 
 client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client_sock.connect(('127.0.0.1', 53210))
+client_sock.connect(('192.168.88.91', 53210))
 
-server = ('127.0.0.1', 53210)
+server = ('192.168.88.91', 53210)
 
 
 
@@ -23,7 +23,37 @@ def main():
     THREAD.start()
 
     #Создаем канал
-    print ("Для создания канала введите /create_chanel НАЗВАНИЕ")
+    print("Для создания канала введите /create_chanell НАЗВАНИЕ")
+
+    # Создаем канал
+    print("Список уже существующих каналов можно посмотреть при помощи команды /channels")
+
+    #Подключение
+    print("Для подключения к уже существующему каналу введите /set_chanell НАЗВАНИЕ")
+
+    account=''
+
+    print("Введите /create_account ЛОГИН для регистрации или /login ЛОГИН для входа")
+    login, check = "", ""
+    while check != '/create_account' and check != '/login':
+        login = input()
+        check = login.split()[0]
+        if check == '/create_account':
+            client_sock.sendall(login.encode())
+            print ("Введите пароль")
+            parol = input()
+            print("Повторите пароль")
+            parol_povtor = input()
+            if parol == parol_povtor:
+                client_sock.sendall(parol.encode())
+            else:
+                continue
+        if check == '/login':
+            client_sock.sendall(login.encode())
+            print('Введите пароль')
+            parol_login = input()
+            client_sock.sendall(parol_login.encode())
+
 
     print("Введите ник /set_Nickname <nickname>")
     nickname, check = "",""
