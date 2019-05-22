@@ -2,17 +2,16 @@ import socket,time
 from threading import Thread
 
 client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client_sock.connect(('192.168.88.91', 53210))
+client_sock.connect(('127.0.0.1', 53210))
 
-server = ('192.168.88.91', 53210)
-
+server = ('127.0.0.1', 53210)
 
 
 def listen_Server():
     while True:
         try:
             data = client_sock.recv(1024)
-            print('Received', repr(data.decode("utf-8")))
+            print(repr(data.decode("utf-8")))
         except Exception:
             print('Socket close')
             return
@@ -40,7 +39,7 @@ def main():
         check = login.split()[0]
         if check == '/create_account':
             client_sock.sendall(login.encode())
-            print ("Введите пароль")
+            print("Введите пароль")
             parol = input()
             print("Повторите пароль")
             parol_povtor = input()
@@ -64,9 +63,9 @@ def main():
 
     while True:
         #Читаем логи
-     #   history = open('data/text.txt', 'r')
-     #   print(history.read())
-     #   history.close()
+      #  history = open('data/text.txt', 'r')
+       # print(history.read())
+      #  history.close()
 
         #Проверяем на безсимвольность
         print("Введите что-нибудь")

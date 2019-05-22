@@ -1,8 +1,6 @@
 #Выводить ники отправителя
 #Убрать Received
 
-
-
 import socket, time
 import mysql.connector
 from threading import Thread
@@ -18,6 +16,8 @@ KANALbI['main_chan'] = list()
 #serverlog.close()
 
 #Основной процесс работы
+
+
 def check_parol_for_login(parol,cnx):
     cursor = cnx.cursor()
     quary = ('select count(*) from users where password ="' + parol + '"')
@@ -54,7 +54,7 @@ def new_user(nickname,login,parol,cnx):
 
 def check_nickname(nickname,cnx):
     cursor = cnx.cursor()
-    quary = ('select count(*) from nicknames where nickname ="'+nickname+'"')
+    quary = ('select count(*) from users where nickname ="'+nickname+'"')
     cursor.execute(quary)
     for (nickname) in cursor:
         nickname = nickname[0]
@@ -67,7 +67,7 @@ def check_nickname(nickname,cnx):
 
 def new_nickname(login,nickname,cnx):
     cursor = cnx.cursor()
-    quary = ('insert into users (nickname) values ("'+nickname+'") where login = "'+login+'"')
+    quary = ('update users set nickname = "'+nickname+'" where login = "'+login+'"')
     cursor.execute(quary)
     for (nickname) in cursor:
         print(nickname)
@@ -77,6 +77,7 @@ def new_nickname(login,nickname,cnx):
 def main_process(client_sock, client_addr, cnx):
     chanell = ''
     nickname = ''
+    login = ''
 
     while True:
         vremya = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
@@ -101,12 +102,12 @@ def main_process(client_sock, client_addr, cnx):
         #Регистрация
         if data_dec.split()[0] == '/create_account':
             login = data_dec.split()[1]
-            if check_login(login,cnx):
+            if check_login(login, cnx):
                 client_sock.sendall('Такой логин уже существует'.encode("utf-8"))
             data = client_sock.recv(1024)
             data_dec = data.decode("utf-8")
             parol = data_dec
-            new_user(nickname,login,parol,cnx)
+            new_user(nickname, login, parol, cnx)
             print("Добавлен новый пользователь ")
 
         #Вход
@@ -117,11 +118,10 @@ def main_process(client_sock, client_addr, cnx):
                 data = client_sock.recv(1024)
                 data_dec = data.decode("utf-8")
                 parol = data_dec
-                if check_parol_for_login(parol,cnx):
+                if check_parol_for_login(parol, cnx):
                     client_sock.sendall('Вход выполнен'.encode("utf-8"))
                 else:
                     client_sock.sendall('Ошибка логина - пароля'.encode("utf-8"))
-
 
 
         #Установка ника
@@ -129,7 +129,7 @@ def main_process(client_sock, client_addr, cnx):
             nickname = data_dec.split()[1]
             if check_nickname(nickname,cnx):
                 client_sock.sendall('Такой пользователь уже существует'.encode("utf-8"))
-            new_nickname(nickname, cnx)
+            new_nickname(login, nickname, cnx)
         print(vremya, "|", client_addr, "|", nickname, "-", data.decode("utf-8"))
 
 
@@ -171,19 +171,20 @@ def main_process(client_sock, client_addr, cnx):
         if chanell !='':
             for send_sock in KANALbI[chanell]:
                 if send_sock != client_sock:
+                    send_sock.sendall(nickname.encode("utf-8")+':'.encode("utf-8"))
                     send_sock.sendall(data)
 
 #Запуск сервера, сокеты и т.д
 def main():
     serv_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM, proto=0)
-    serv_sock.bind(('127.0.0.1', 53210))
+    serv_sock.bind(('0.0.0.0', 53210))
     serv_sock.listen(10)
 
     cnx = mysql.connector.connect(user='root', password='rjhdby98',
                                   host='127.0.0.1',
                                   database='chat')
     cursor = cnx.cursor()
-    quary = ('delete from nicknames where id !=0')
+    quary = ('delete from users where id !=0')
     cursor.execute(quary)
     appendics = cursor.lastrowid
     cnx.commit()
